@@ -5,7 +5,9 @@ import Moment from "react-moment";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { removePost } from "../redux/features/post/postSlice";
+import { CommentItem } from "../components/CommentItem";
 import { toast } from "react-toastify";
+import { createComment, getPostComments } from "../redux/features/comment/commentSlice";
 
 export const PostPage = () => {
   const params = useParams();
@@ -13,8 +15,10 @@ export const PostPage = () => {
   const navigate = useNavigate();
 
   const { user } = useSelector((state) => state.auth);
+  const { comments } = useSelector((state) => state.comment);
 
   const [post, setPost] = useState(null);
+  const [comment, setComment] = useState('');
 
   const removePostHandler = () => {
     try {
@@ -26,6 +30,24 @@ export const PostPage = () => {
     }
   }
 
+  const handlerSubmit = () => {
+    try {
+      const postId = params.id;
+      dispatch(createComment({postId, comment}));
+      setComment('');
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const fetchComments = useCallback(async () => {
+    try {
+      dispatch(getPostComments(params.id));
+    } catch (error) {
+      console.log(error);
+    }
+  }, [params.id, dispatch])
+
   const fetchPost = useCallback(async () => {
     const { data } = await axios.get(`/posts/${params.id}`);
 
@@ -35,6 +57,10 @@ export const PostPage = () => {
   useEffect(() => {
     fetchPost();
   }, [fetchPost]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   if (!post) {
     return (
@@ -100,7 +126,14 @@ export const PostPage = () => {
             )}
           </div>
         </div>
-        <div className="w-1/3">COMMENTS</div>
+        <div className="w-1/3 p-8 bg-gray-700 flex flex-col gap-2 rounded-sm">
+          <form className="flex gap-2 mb-2" onSubmit={e => e.preventDefault()}>
+              <input type="text" value={comment} onChange={e => setComment(e.target.value)} placeholder="Комментарий" className="text-black w-full rounded-sm bg-gray-400 border p-1 text-xl outline-none placeholder:text-gray-700" />
+              <button type="submit" onClick={handlerSubmit} className="flex justify-center items-center bg-gray-600 text-sm text-white rounded-sm py-1 px-4">Отправить</button>
+          </form>
+
+          {comments?.map(comment => <CommentItem key={comment._id} comment={comment} />)}
+        </div>
       </div>
     </div>
   );

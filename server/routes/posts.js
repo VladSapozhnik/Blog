@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { checkAuth } from "../utils/checkAuth.js";
-import { createPost, getAll, getById, getMyPosts, removePost, updatePost } from "../controllers/posts.js";
+import { createPost, getAll, getById, getMyPosts, removePost, updatePost, getPostComments } from "../controllers/posts.js";
 
 const router = Router();
 
@@ -21,5 +21,8 @@ router.put('/:id', checkAuth, updatePost);
 
 //remove posts
 router.delete('/:id', checkAuth, removePost);
+
+//Get post comments
+router.get('/comments/:id', checkAuth, getPostComments);
 
 export default router;

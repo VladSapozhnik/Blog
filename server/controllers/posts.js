@@ -2,6 +2,7 @@ import { fileURLToPath } from "url";
 import Post from "../models/Post.js";
 import path, { dirname } from "path";
 import User from "../models/User.js";
+import Comment from "../models/Comment.js";
 
 export const createPost = async (req, res) => {
   try {
@@ -127,5 +128,21 @@ export const removePost = async (req, res) => {
       res.json({message: 'Пост был удален.'})
   } catch (error) {
       res.json({ message: 'Что-то пошло не так.' })
+  }
+}
+
+export const getPostComments = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    
+    const list = await Promise.all(
+      post.comments.map(comment => {
+        return Comment.findById(comment)
+      })
+    )
+
+    res.json(list);
+  } catch (error) {
+    res.json({ message: 'Что-то пошло не так.' })
   }
 }

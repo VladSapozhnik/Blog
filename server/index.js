@@ -4,6 +4,7 @@ import dotenv from "dotenv"
 import cors from "cors";
 import authRoute from './routes/auth.js'
 import postRoute from './routes/posts.js'
+import commentRoute from './routes/comments.js'
 import fileUpload from "express-fileupload";
 
 const app = express();
@@ -23,6 +24,7 @@ const DB_PASSWORD = process.env.DB_PASSWORD;
 //routes
 app.use('/api/auth', authRoute)
 app.use('/api/posts', postRoute)
+app.use('/api/comments', commentRoute)
 
 app.get('/', (req, res) => {
   res.send('Home page')
